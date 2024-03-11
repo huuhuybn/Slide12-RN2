@@ -1,21 +1,16 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {PropsWithChildren} from 'react';
 import {
+  Alert,
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
-  View,
-} from 'react-native';
+  View
+} from "react-native";
 
 import {
   Colors,
@@ -24,75 +19,65 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import MyView from "./MyView.tsx";
+import CustomHeader from "./CustomHeader.tsx";
+import CustomView from "./CustomView.tsx";
+import CustomNumber from "./CustomNumber.tsx";
+import MyProvider from "./MyProvider.tsx";
+import { getContext } from "./MyContext.tsx";
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
 
-function Section({children, title}: SectionProps): React.JSX.Element {
+const Content = ()=>{
   const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  // useMemo , memo (Memory)
+  // useCallback
+  // useContext :
+  // chia sẻ thông tin trên toàn bộ dự án RN
+
+  const [number, setNumber] =
+    useState(0);
+  const [number2, setNumber2] =
+    useState(0);
+
+  const inscreaseNumber2 = useCallback(()=>{
+    setNumber2(number2 + 1)
+  },[number2])
+
+  const tinhBinhPhuongNumber = useMemo(()=>{
+    return number * number
+  }, [number])
+
+  //const {name,setName} = getContext();
+  return  <SafeAreaView style={{ flex : 1}}>
+    <StatusBar
+      barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+      backgroundColor={backgroundStyle.backgroundColor}
+    />
+    <View style={{flex : 1, backgroundColor : 'white'}}>
+      <Text style={{fontSize : 44}}> Number 2 : {number2}</Text>
+      {/*custom component hien thi number !!!*/}
+      <Text> {tinhBinhPhuongNumber}</Text>
+      <CustomNumber number={number}/>
+      <Button title={"Update Number2"} onPress={inscreaseNumber2}/>
+      <Button title={"Update Number"} onPress={()=>{
+        //number2 = number2 + 1
+        setNumber(number + 1);
+      }}/>
+    </View>
+
+  </SafeAreaView>
+}
+function App(): React.JSX.Element {
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <MyProvider>
+      <View style={{ flex : 1, backgroundColor : 'black'}}>
+        <Content/>
+      </View>
+    </MyProvider>
   );
 }
 
